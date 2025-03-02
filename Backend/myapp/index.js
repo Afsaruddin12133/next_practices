@@ -1,17 +1,22 @@
 const express = require('express');
 const product = require('./product.json');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const app = express();
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const port =  5000;
+
+// MiddleWare
+app.use(cors());
+app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
 })
 
+// MongoDB Connection
+const uri = "mongodb+srv://afsaruddin12133:YV3jvEQIqBagF9D3@practices.q2mjf.mongodb.net/?retryWrites=true&w=majority&appName=practices";
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://afsaruddin12133:<db_password>@practices.q2mjf.mongodb.net/?retryWrites=true&w=majority&appName=practices";
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -22,19 +27,26 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // Send a ping to confirm a successful connection
+
+    const database = client.db("userDB");
+    const userCollection = database.collection("users");
+
+    app.post('/users',async(req,res)=>{
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+    })
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
 
-
+// Routes..
 app.get('/product', (req,res) => {
     res.send(product);
 })
