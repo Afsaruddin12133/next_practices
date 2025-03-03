@@ -1,14 +1,16 @@
 "use client";
 
-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useRouter } from 'next/navigation';
 import React from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form';
+
 
 export default function login() {
 
-    const { register, handleSubmit } = useForm();
+    const { register, handleSubmit, reset } = useForm();
+    const router = useRouter()
     const onSubmit = (data) =>{
         fetch('http://localhost:5000/users',{
           method: 'POST',
@@ -19,7 +21,8 @@ export default function login() {
         })
         .then(response => response.json())
         .then(data =>{
-          console.log(data); 
+           reset();
+           router.push('/product')
         })
         
     }
