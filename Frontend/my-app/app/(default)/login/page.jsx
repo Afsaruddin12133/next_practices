@@ -22,7 +22,7 @@ export default function login() {
         .then(response => response.json())
         .then(data =>{
            reset();
-           router.push('/product')
+           router.push('/users')
         })
         
     }

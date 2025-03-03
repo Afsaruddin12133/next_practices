@@ -1,6 +1,6 @@
 const express = require('express');
 const product = require('./product.json');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion,ObjectId } = require('mongodb');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -31,6 +31,24 @@ async function run() {
 
     const database = client.db("userDB");
     const userCollection = database.collection("users");
+
+    app.delete('/users/:id', async(req,res) =>{
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await userCollection.deleteOne(query);
+      if (result.deletedCount === 1) {
+        console.log("Successfully deleted one document.");
+        res.send(result);
+      } else {
+        console.log("No documents matched the query. Deleted 0 documents.");
+      }
+    })
+
+    app.get('/users', async(req,res) =>{
+      const cursor = userCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
 
     app.post('/users',async(req,res)=>{
       const user = req.body;
